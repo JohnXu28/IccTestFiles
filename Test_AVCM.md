@@ -89,3 +89,8 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.ti
 - 刪除：各目錄 Thumbs.db（Input/Output/Target）、過時 AVCMM.ini（指向不存在路徑）、Output/Lab2CMYK_Ver4.tif/.raw（無對應 golden 舊檔）。
 - Output/ 自版本控制移除（git rm --cached + .gitignore，檔案保留在磁碟與 git 歷史；跑批不再弄髒工作樹）。lzw.bat/LZW.exe 保留（歷史壓縮工具）。
 - Test_AVCM.md 由 Big5 轉為 UTF-8（CRLF 保留）。
+
+【#6 BPC 來源黑點偵測（2026-10-24）】
+- 引擎新增 DetectSourceBlack（IccSP）：bkpt tag 為完美黑 (0,0,0) 時，改以 lcms 風格偵測來源黑點（裝置黑 (0,0,0) 過 A2B0 -> 中性化 -> L 截斷 -> D50 XYZ），與 lcms BlackPointAsDarkerColorant 一致。
+- 實測發現：S2L/S4L 的裝置黑過 A2B0 即為 (0,0,0)，與 tag 相同 -> 偵測結果與原值一致 -> 6 個 BPC golden 無需重產，207 案維持全零（無回歸，unit tests 56 案亦全過）。
+- 追查結論：RGB 輸入 BPC 與 lcms 的 dE 差距（mean 4.3-7.4）並非黑點推導問題——兩邊黑點相同、per-axis XYZ 仿射公式也與 lcms ComputeBlackPointCompensation 等價；差異來自管線精度（引擎分段 8/16-bit LUT 鏈 vs lcms 優化預算 CLUT）。若要縮小需提升引擎 CLUT 合成精度，屬獨立工程項目。
