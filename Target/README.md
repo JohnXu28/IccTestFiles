@@ -32,6 +32,11 @@
 - lcms BPC 交叉驗證：Lab 輸入 dE mean 0.64–0.97；RGB 輸入 dE mean 4.3–7.4（來源黑點推導不同，見 `Test_AVCM.md`）。
 - FullTest 192 案全零。
 
+## 2026-10-24（同日）M 系列覆蓋補齊（L3）
+
+- 新增 15 個 golden：M* 三組 profile 的 RGB16→Lab8/16（6 案）+ CMYK_V4 輸出腳（9 案，`*V4.tif`）。
+- lcms 抽驗 dE mean 1.33–2.01；FullTest 207 案全零。
+
 ## 歷史
 
 - M*（matrix-shaper）16 案：2026-10-14 由現行引擎產出（data repo commit `824d191`）。

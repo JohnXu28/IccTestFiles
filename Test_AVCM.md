@@ -78,3 +78,9 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - M1：Target2 已刪除（144 檔，先驗證全部同名存在於 Target 才刪；git 歷史保留可復原）。
 - M2：輸出檔命名統一為 PascalCase，共 17 處（Main.cpp 設定表 + 註解行）：RGB82lab8/16、RGB82lab_8/16、SAT/REL/ABS 同型 -> RGB8ToLab8/16；RGb8 系列 -> RGB8ToRGB8。13 個 golden 檔改名（其餘 4 個僅存在於註解行）。FullTest 192 案全零、快照同步。
 - 剩餘待辦：L3（M 系列覆蓋缺口）。
+
+【L3 M 系列覆蓋缺口完成（2026-10-24）】
+- 新增 15 案：M_sRGB/M_Adobe/M_Apple 的 RGB16->Lab8/Lab16（6 案）+ M 系列 CMYK_V4 輸出腳（RGB8->CMYK8/16、RGB16->CMYK16 各 3，共 9 案，檔名 *V4.tif）。
+- FullTest 207 案全零、EXIT 0；快照 207 行全零；註解同步。
+- lcms 抽驗：RGB16->Lab16 dE mean 1.33-1.42/max 6.4-6.7；M->CMYK_V4 dE mean 1.78-2.01/max 8.6-9.5。
+- 改善清單全部完成：H1/H2、H3、L5、M4+L1、M1、M2、L3、Lab v4 編碼。
