@@ -47,3 +47,9 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - H2 CI 門禁納入 8-bit：快照 84->160 行（舊 16-bit 84 行與 WSL 重跑逐行一致，跨平台確定性確認）；golden_fulltest.cmake 對 RC=1（超標）不直接 FATAL，由快照逐案比對把關，RC 為其他值才立即失敗。
 - 執行發現 9 案 AVE>1000（AVE 1122-1411），全是 RGB->8-bit 輸出的舊 golden：V2V2RGB82lab8、V2V2RGB8ToCMYK8、V2V2RGB16ToLab8、V2V2RGB16ToCMYK8、V2V4RGB8ToCMYK8、V4V2RGB82lab_8、V4V2RGB8ToCMYK8、V4V2RGB16ToCMYK8、V4V4RGB8ToCMYK8 -> 即 H3 golden 重建的優先處理清單。
 - 環境備註：Windows 端新編譯 exe 被 Smart App Control 擋下（新 hash 無簽章），驗證改於 WSL（Ubuntu-26.04、g++-13）執行；WSL 內建置程序＝源碼 tar 複製到 ~/gazelle-build，make 由 apt-get download + dpkg -x 取得（免 sudo），CXX=g++-13 make -f Makefile_AVCM。
+
+【H3 golden 重建完成記錄（2026-10-24）】
+- 驗證：以 lcms2 2.19（Little-CMS 源碼於 WSL 自建）交叉驗證 12 代表案（含全部 9 超標案）——Lab 輸出 dE76 mean 0.592-1.155 / max 3.19-9.94；CMYK 輸出經輸出 profile A2B 換算 dE76 mean 0.382-1.231 / max 3.04-7.94 -> 判定通過（獨立 CMM 實作合理差異範圍）。工具：Gazelle apps/ICC_Test/lcms_check.cpp（須以 -DFIXED_VECTOR 編譯，與 Tiff_STL4 類別佈局一致）。
+- 升格：Output/ 160 案 -> Target/（144 檔更新、M* 16 檔 byte-exact 不變）；WSL 重跑 FullTest：全 160 案 Total Error 0、EXIT 0、無超標無 skip；CI 快照重建為全零 160 行。
+- 9 個原 AVE>1000 的 RGB->8-bit 案全部歸零；CLR6/CLR7 未做 lcms 多通道對照（維持引擎輸出升格）。重建歷程與重現程序見 Target/README.md。
+- 剩餘待辦：M4（BPC 端到端子集）、L3（M 系列覆蓋缺口）、FullRange 子集加案。
