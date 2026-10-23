@@ -65,3 +65,11 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - 20 個 FR golden 升格 Target/；FullTest 180 案全零、EXIT 0；快照重建為 180 行全零；golden_fulltest.cmake 與 tests/CMakeLists.txt 註解更新（160->180）。
 - lcms 抽驗：FR S2L RGB8->Lab16 dE mean 0.174/max 5.89；FR matrix-shaper(sRGB) RGB8->Lab16 dE mean 0.515/max 5.93（引擎合成 A2B 與 lcms 原生 TRC+matrix 一致）；FR RGB8->CMYK8 dE mean 0.462/max 6.87。
 - 剩餘待辦：M4（BPC 端到端子集）+ L1（intent 多樣化）、M1（Target2 封存）、M2（命名統一）、L3（M 系列覆蓋缺口）。
+
+【M4 BPC + L1 intent 子集加案完成（2026-10-24）】
+- harness：Setting 增加 m_Intent/m_DoBPC/m_BPCZeroSrcBlack（建構子預設值，既有 180 案行為不變）；AV_Icc_SetProfile 支援 SetBPC（於 ConstructEngine 前呼叫）。
+- 新增 12 案：BPC 6 案（S2L RGB8/16->CMYK V2BPC/V4BPC、M_sRGB->V2BPC、Lab8/16->V2BPC 用 ZeroSrcBlack）+ intent 6 案（Saturation/Relative/Absolute x CMYK8/Lab16）。輸出與 Perceptual/非 BPC 對應案均有差異（路徑確認有跑到）。
+- BPC 測試 profile：Icc/PrinterCMYKV2BPC.icc、PrinterCMYKV4BPC.icc、PrinterRGBV2BPC.icc（原 profile 無 bkpt tag，BPC 會靜默 no-op；以 lcms cmsDetectDestinationBlackPoint 推算裝置黑點寫入 bkpt，工具 IccAddBkpt.cpp）。
+- 驗證：FullTest 192 案全零、EXIT 0；快照 192 行全零；golden 註解更新。
+- lcms 交叉驗證（cmsFLAGS_BLACKPOINTCOMPENSATION）：Lab 輸入 BPC 案 dE mean 0.643-0.967/max 3.9-6.6（兩邊黑點一致時高度相符）；RGB 輸入 BPC 案 dE mean 4.3-7.4/max 16-19（來源黑點推導不同：引擎讀 S2L bkpt tag=(0,0,0)，lcms 自 A2B 偵測掃描器實際黑點；此差異已記錄，是否改用偵測黑點屬引擎決策）。golden 已保護引擎 BPC 路徑。
+- 剩餘待辦：M1（Target2 封存）、M2（命名統一）、L3（M 系列覆蓋缺口）。

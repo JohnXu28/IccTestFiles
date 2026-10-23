@@ -26,6 +26,12 @@
 - 新增 20 個 `FR*` golden：`FullRange8.tif`/`FullRange16.tif` 梯度輸入（0..255 / 0..65535 全域碼值）的 M* matrix-shaper 全 16 案 + V2V2 4 案，補 IT8 patch 輸入測不到的端點覆蓋。
 - lcms 抽驗 dE mean 0.174–0.515（含 matrix-shaper 與 lcms 原生 TRC+matrix 對照）；FullTest 180 案全零。
 
+## 2026-10-24（同日）BPC 與 intent 子集（M4/L1）
+
+- 新增 12 個 golden：BPC 6 案（`PrinterCMYKV2BPC/V4BPC.icc`，bkpt 由 lcms 偵測裝置黑點寫入）+ intent 6 案（Saturation/Relative/Absolute × CMYK8/Lab16）。
+- lcms BPC 交叉驗證：Lab 輸入 dE mean 0.64–0.97；RGB 輸入 dE mean 4.3–7.4（來源黑點推導不同，見 `Test_AVCM.md`）。
+- FullTest 192 案全零。
+
 ## 歷史
 
 - M*（matrix-shaper）16 案：2026-10-14 由現行引擎產出（data repo commit `824d191`）。
