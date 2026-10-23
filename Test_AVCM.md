@@ -59,3 +59,9 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - 程式變更（Gazelle）：OutputTable33::OutputLab_8/16、InputTable33::Change_Lut16_To_Lab8/Lab16 與 Set1DLutIn（Lab16 輸入升級為全 16-bit 路徑）、Tiff_STL4.h/clch.h 的 Tiff_encode/decode_*（含負值 off-by-one 修正）、Straw PS.cpp 4 處、lcms_check.cpp 解碼簡化；新增 LabReencode.cpp 遷移工具。ICC 檔案格式（tag/CLUT）的 Icc_encode_* 為標準 v2、維持不變。
 - 資料遷移：Input/IT8_Lab.tif、IT8_Lab16.tif、Lab100.tif 以 LabReencode 重編碼；36 個 Lab 相關 golden 由重跑升格（其餘 124 案不受影響）；快照維持全零 160 行。
 - lcms 2.19 零正規化再驗證：Lab8 輸出 dE mean 0.592-1.155；Lab16 輸出 dE mean 0.505（L 通道誤差 0.368->0.200）；Lab16->CMYK16 dE mean 0.249、max 2.75 -> 與 lcms TYPE_Lab_8/16 直接互通。
+
+【L5 FullRange 子集加案完成（2026-10-24）】
+- Main.cpp 新增 20 案：M* matrix-shaper 全 16 案（sRGB/Adobe/Apple x Lab8/Lab16/sRGB100_16/CMYK8/CMYK16/RGB16->CMYK16）+ V2V2 RGB8/16->Lab16/CMYK 4 案；輸入為 Input/FullRange8.tif、FullRange16.tif（GenFullRange 產生），輸出檔名 FR 前綴；現有 160 案行為不變。
+- 20 個 FR golden 升格 Target/；FullTest 180 案全零、EXIT 0；快照重建為 180 行全零；golden_fulltest.cmake 與 tests/CMakeLists.txt 註解更新（160->180）。
+- lcms 抽驗：FR S2L RGB8->Lab16 dE mean 0.174/max 5.89；FR matrix-shaper(sRGB) RGB8->Lab16 dE mean 0.515/max 5.93（引擎合成 A2B 與 lcms 原生 TRC+matrix 一致）；FR RGB8->CMYK8 dE mean 0.462/max 6.87。
+- 剩餘待辦：M4（BPC 端到端子集）+ L1（intent 多樣化）、M1（Target2 封存）、M2（命名統一）、L3（M 系列覆蓋缺口）。

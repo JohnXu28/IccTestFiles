@@ -21,6 +21,11 @@
 - `Input/IT8_Lab.tif`、`IT8_Lab16.tif`、`Lab100.tif` 以 `LabReencode.cpp` 同步重編碼；其餘 124 案未受影響；快照維持全零 160 行。
 - 舊 signed（無偏移）編碼的 Lab 檔自此不再被支援；與 lcms TYPE_Lab_8/16 直接互通（驗證 dE 見 `Test_AVCM.md`）。
 
+## 2026-10-24（同日）FullRange 子集（L5）
+
+- 新增 20 個 `FR*` golden：`FullRange8.tif`/`FullRange16.tif` 梯度輸入（0..255 / 0..65535 全域碼值）的 M* matrix-shaper 全 16 案 + V2V2 4 案，補 IT8 patch 輸入測不到的端點覆蓋。
+- lcms 抽驗 dE mean 0.174–0.515（含 matrix-shaper 與 lcms 原生 TRC+matrix 對照）；FullTest 180 案全零。
+
 ## 歷史
 
 - M*（matrix-shaper）16 案：2026-10-14 由現行引擎產出（data repo commit `824d191`）。
