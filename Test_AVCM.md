@@ -8,7 +8,7 @@ Test_AVCM 強化測試計畫
 
 ===================== 檢討結論與後續改善建議（2026-10-23） =====================
 
-【現況調查】上方 6 題對應的程式碼與資料事實：
+【現況調查】上方 6 題對應的程式碼與資料事實（2026-10-23 時點快照；CompareTiff 失敗行為、案例數 160、intent 全 Perceptual 等敘述已被下方完成記錄更新，現況以最後一節為準）：
 - 測試主程式是 apps/ICC_Test/Main.cpp 的 FullTest()：約 160 筆有效案例，逐案把 Input/ 轉換到 Output/，再與 Target/ 同名檔做逐 byte 比對（CompareTiff）。
 - CompareTiff 現況：8-bit 印 "Error : ... AVE(*1000)"，16-bit 印 "Total Error : ... AVE(*1000)"；AVE 超標（>1000）只印 "Error *****" 警示，函式永遠回傳 0，單案超標不會讓測試失敗；缺 target 檔時直接 skip（靜默通過）。
 - CI 門禁（tests/golden_fulltest.cmake）只抓 "Total Error" 行與快照 tests/golden/fulltest_errors.txt 比對，所以只有 16-bit 案例被 gate，8-bit 案例完全沒有門禁。
@@ -94,3 +94,17 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.ti
 - 引擎新增 DetectSourceBlack（IccSP）：bkpt tag 為完美黑 (0,0,0) 時，改以 lcms 風格偵測來源黑點（裝置黑 (0,0,0) 過 A2B0 -> 中性化 -> L 截斷 -> D50 XYZ），與 lcms BlackPointAsDarkerColorant 一致。
 - 實測發現：S2L/S4L 的裝置黑過 A2B0 即為 (0,0,0)，與 tag 相同 -> 偵測結果與原值一致 -> 6 個 BPC golden 無需重產，207 案維持全零（無回歸，unit tests 56 案亦全過）。
 - 追查結論：RGB 輸入 BPC 與 lcms 的 dE 差距（mean 4.3-7.4）並非黑點推導問題——兩邊黑點相同、per-axis XYZ 仿射公式也與 lcms ComputeBlackPointCompensation 等價；差異來自管線精度（引擎分段 8/16-bit LUT 鏈 vs lcms 優化預算 CLUT）。若要縮小需提升引擎 CLUT 合成精度，屬獨立工程項目。
+
+【#7 Output/ 目錄 fresh-clone 修復 + win-debug 門禁（2026-10-24）】
+- 事件：GitHub CI FullTest 全 207 案 geometry mismatch（本機/WSL 全零）。根因鏈：
+  L2 起 Output/ 自版本控制移除（gitignore），CI --depth 1 全新 clone 無此目錄 ->
+  CTiff::SaveFile 寫檔全失敗且被 AV_Icc_ConvertFile 吞掉例外 -> CompareTiff 把缺失
+  輸出讀成退化物件（零標籤）-> 全案 geometry mismatch。本機/WSL 因磁碟殘留
+  Output/ 目錄而全零，故本機無法重現 CI 狀態。
+- 修復（Gazelle 715fcd5）：FullTest 開跑前以 _mkdir/mkdir 建立 OutputPath；
+  CompareTiff 增加輸出檔存在檢查，寫檔失敗明確報 output missing 而非偽 mismatch。
+- 驗證：WSL fresh clone 207/207 全零 EXIT 0；Windows MSVC fresh clone 同；
+  Golden_FullTest 門禁通過；不需重產 golden。
+- CI 強化：win-debug job 接入 Golden_FullTest 門禁（MSVC 軌 byte-exact 常設驗證）；
+  apps/ICC_Test/err.txt 重跑收錄 207 案 Windows 日誌（舊檔為 160 案時代）。
+- 教訓：本機全綠但 CI 全紅時，先比對資料目錄狀態——fresh clone 才是 CI 的等價狀態。
