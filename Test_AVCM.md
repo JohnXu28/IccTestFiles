@@ -53,3 +53,9 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - 升格：Output/ 160 案 -> Target/（144 檔更新、M* 16 檔 byte-exact 不變）；WSL 重跑 FullTest：全 160 案 Total Error 0、EXIT 0、無超標無 skip；CI 快照重建為全零 160 行。
 - 9 個原 AVE>1000 的 RGB->8-bit 案全部歸零；CLR6/CLR7 未做 lcms 多通道對照（維持引擎輸出升格）。重建歷程與重現程序見 Target/README.md。
 - 剩餘待辦：M4（BPC 端到端子集）、L3（M 系列覆蓋缺口）、FullRange 子集加案。
+
+【Lab 編碼改為 ICC v4 標準（2026-10-24）】
+- 背景：引擎 Lab a/b 原為私有 signed 編碼（8-bit signed byte、16-bit (short)(a*256)），不符合 ICC；且輸入側（offset 解讀）與輸出側（signed 寫出）不對稱，自己產出的 Lab 檔餵回自己會偏移。現統一改為 ICC v4：Lab8 L=L*2.55、a/b=a+128；Lab16 L=L*65535/100、a/b=(a+128)*257。
+- 程式變更（Gazelle）：OutputTable33::OutputLab_8/16、InputTable33::Change_Lut16_To_Lab8/Lab16 與 Set1DLutIn（Lab16 輸入升級為全 16-bit 路徑）、Tiff_STL4.h/clch.h 的 Tiff_encode/decode_*（含負值 off-by-one 修正）、Straw PS.cpp 4 處、lcms_check.cpp 解碼簡化；新增 LabReencode.cpp 遷移工具。ICC 檔案格式（tag/CLUT）的 Icc_encode_* 為標準 v2、維持不變。
+- 資料遷移：Input/IT8_Lab.tif、IT8_Lab16.tif、Lab100.tif 以 LabReencode 重編碼；36 個 Lab 相關 golden 由重跑升格（其餘 124 案不受影響）；快照維持全零 160 行。
+- lcms 2.19 零正規化再驗證：Lab8 輸出 dE mean 0.592-1.155；Lab16 輸出 dE mean 0.505（L 通道誤差 0.368->0.200）；Lab16->CMYK16 dE mean 0.249、max 2.75 -> 與 lcms TYPE_Lab_8/16 直接互通。

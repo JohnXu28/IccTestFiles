@@ -15,7 +15,13 @@
 - **未以 lcms 驗證**：CLR6/CLR7 多色案維持升格自現行引擎輸出（lcms 多通道對照未做）；M* matrix-shaper 16 案與引擎 byte-exact、未變。
 - **重現程序**：Gazelle repo 的 `apps/ICC_Test/lcms_check.cpp` 與 `GenFullRange.cpp` 檔頭註解；流程記錄於 `Test_AVCM.md`。
 
+## 2026-10-24（同日）Lab 編碼改為 ICC v4
+
+- 36 個 Lab 相關 golden 改以 ICC v4 PCS 編碼重產：Lab8 L=L×2.55、a/b=a+128；Lab16 L=L×65535/100、a/b=(a+128)×257（引擎程式變更見 Gazelle commit）。
+- `Input/IT8_Lab.tif`、`IT8_Lab16.tif`、`Lab100.tif` 以 `LabReencode.cpp` 同步重編碼；其餘 124 案未受影響；快照維持全零 160 行。
+- 舊 signed（無偏移）編碼的 Lab 檔自此不再被支援；與 lcms TYPE_Lab_8/16 直接互通（驗證 dE 見 `Test_AVCM.md`）。
+
 ## 歷史
 
 - M*（matrix-shaper）16 案：2026-10-14 由現行引擎產出（data repo commit `824d191`）。
-- V2V2/V2V4/V4V2/V4V4 系列：JohnXu28/IccTestFiles 早期產出（確切工具已無記錄），2026-10-24 起由本次重建取代。
+- V2V2/V2V4/V4V2/V4V4 系列：JohnXu28/IccTestFiles 早期產出（確切工具已無記錄），2026-10-24 起由 H3 重建取代（同日晚改為 ICC v4 Lab 編碼）。
