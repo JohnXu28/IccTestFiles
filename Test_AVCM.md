@@ -73,3 +73,8 @@ L5. FullRange 端點/全域覆蓋測試：加入。已產生 Input/FullRange8.tif（256x256 RGB 
 - 驗證：FullTest 192 案全零、EXIT 0；快照 192 行全零；golden 註解更新。
 - lcms 交叉驗證（cmsFLAGS_BLACKPOINTCOMPENSATION）：Lab 輸入 BPC 案 dE mean 0.643-0.967/max 3.9-6.6（兩邊黑點一致時高度相符）；RGB 輸入 BPC 案 dE mean 4.3-7.4/max 16-19（來源黑點推導不同：引擎讀 S2L bkpt tag=(0,0,0)，lcms 自 A2B 偵測掃描器實際黑點；此差異已記錄，是否改用偵測黑點屬引擎決策）。golden 已保護引擎 BPC 路徑。
 - 剩餘待辦：M1（Target2 封存）、M2（命名統一）、L3（M 系列覆蓋缺口）。
+
+【M1/M2 完成記錄（2026-10-24）】
+- M1：Target2 已刪除（144 檔，先驗證全部同名存在於 Target 才刪；git 歷史保留可復原）。
+- M2：輸出檔命名統一為 PascalCase，共 17 處（Main.cpp 設定表 + 註解行）：RGB82lab8/16、RGB82lab_8/16、SAT/REL/ABS 同型 -> RGB8ToLab8/16；RGb8 系列 -> RGB8ToRGB8。13 個 golden 檔改名（其餘 4 個僅存在於註解行）。FullTest 192 案全零、快照同步。
+- 剩餘待辦：L3（M 系列覆蓋缺口）。
